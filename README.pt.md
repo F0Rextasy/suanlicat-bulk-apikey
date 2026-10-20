@@ -20,7 +20,7 @@
 [![9Router](https://img.shields.io/badge/9Router-connector-8B5CF6?style=for-the-badge)](#-connect-to-9router)
 [![X](https://img.shields.io/badge/X-%40bigbullapp-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/bigbullapp)
 
-[🛠 Início rápido](#-quick-start) · [🎁 Nível gratuito](#-free-tier--how-much-you-get) · [🤖 Modelos](#-models--all-17-of-them) · [🧪 Use a API](#-how-to-use-the-api) · [✅ Verificado](#-verified-working--every-key-is-tested) · [🧭 Como funciona](#-how-it-works) · [🔌 9Router](#-connect-to-9router) · [⚙️ Opções](#️-cli-options) · [🛰️ Proxies](#️-behind-a-proxy) · [🐞 Problemas](#-issues)
+[🛠 Início rápido](#-quick-start) · [🎁 Plano gratuito](#-free-tier--how-much-you-get) · [🤖 Modelos](#-models--all-17-of-them) · [🧪 Use a API](#-how-to-use-the-api) · [✅ Verificado](#-verified-working--every-key-is-tested) · [🧭 Como funciona](#-how-it-works) · [🔌 9Router](#-connect-to-9router) · [⚙️ Opções](#️-cli-options) · [🛰️ Proxies](#️-behind-a-proxy) · [🐞 Problemas](#-issues)
 
 </div>
 
@@ -36,18 +36,18 @@
 
 O SuanliCat (算力狐) distribui **100.000 unidades de cota (≈ $1 com qpu=100.000) para cada nova conta** e ainda paga um **check-in diário de ~13.270 unidades**. O cadastro é e-mail + código de 6 caracteres, sem captcha; a linha de chave ativa é `deepseek-v4.1-flash`, e a ferramenta inteira foi comprovada de ponta a ponta criando **100 contas → 100 chaves verificadas**.
 
-## 🎁 Nível gratuito — quanto você recebe
+## 🎁 Plano gratuito — quanto você recebe
 
 | O quê | Valor |
 | --- | --- |
 | Crédito de cadastro (`quotaStart`) | **100.000 unidades ≈ $1** (qpu=100.000) |
-| Check-in diário | **~+13.270 unidades/dia** (medido; a CLI faz check-in uma vez por conta antes de guardar sua chave) |
+| Check-in diário | **~+13.270 unidades/dia** (medido; a CLI faz check-in uma vez por conta antes de manter sua chave) |
 | Cadastro | e-mail + código de 6 caracteres — **sem captcha** (`turnstile_check: false`) |
-| Catálogo | 17 entradas de modelos na planilha de preços ativa |
+| Catálogo | 17 entradas de modelos na tabela de preços ativa |
 | Limites de taxa | o registro responde `429` em rajadas (`register refused`); a CLI espera ~25 s e tenta novamente com o mesmo código novo |
 | A unidade que escala | **uma conta = uma chave** |
 
-> 💡 O nível gratuito é definido pelo SuanliCat (算力狐) e pode mudar. Confira os números ativos em [suanlicat.top](https://suanlicat.top) — e deixe o próprio gate da ferramenta decidir:
+> 💡 O plano gratuito é definido pelo SuanliCat (算力狐) e pode mudar. Confira os números ativos em [suanlicat.top](https://suanlicat.top) — e deixe o próprio portão da ferramenta decidir:
 
 ```bash
 node src/cli.js --verify-only     # every key in keys.txt is re-tested with a real chat call
@@ -55,7 +55,7 @@ node src/cli.js --verify-only     # every key in keys.txt is re-tested with a re
 
 ## 🤖 Modelos — todos os 17
 
-A planilha de preços ativa contém **17 entradas de modelos** (`qwen-turbo`, `doubao-code`, `doubao-pro-max`, `coze-*`, `deepseek-*` …). A linha de chave verificada:
+A tabela de preços ativa contém **17 entradas de modelos** (`qwen-turbo`, `doubao-code`, `doubao-pro-max`, `coze-*`, `deepseek-*` …). A linha de chave verificada:
 
 | ID do modelo | Verificado |
 | --- | --- |
@@ -82,7 +82,7 @@ print(c.chat.completions.create(model="deepseek-v4.1-flash",
 
 ```bash
 cd suanlicat-bulk-apikey
-printf 'socks5://host:port\n' > proxies.txt
+printf 'socks5://host:port\n' > proxies.txt   # optional — without it the tool runs direct
 node src/launcher.js        # interactive: mint / verify / screen / settings
 # or: node src/cli.js --count 30    (check-in runs before the chat gate)
 ```
@@ -91,7 +91,7 @@ Uma chave é gravada em `keys.txt` **somente** depois que `/v1/chat/completions`
 
 ### 🖱️ O launcher
 
-O launcher pede a lista de proxies e a quantidade, memoriza-os e executa a CLI — criar, verificar, verificar saídas, configurações, ajuda, Conectar ao 9Router.
+O launcher pede a lista de proxies e a quantidade, memoriza-os e executa a CLI — criar, verificar, testar saídas, configurações, ajuda, Conectar ao 9Router.
 
 ## ✅ Verificado e funcionando — toda chave é testada
 
@@ -102,7 +102,7 @@ O launcher pede a lista de proxies e a quantidade, memoriza-os e executa a CLI �
 | `POST /api/token/` (+ revelar) | **200** — o material da chave é retornado uma vez |
 | `POST /v1/chat/completions` (`deepseek-v4.1-flash`) — para **cada** chave antes de ser gravada | **200** com conteúdo real — a criação de 100 chaves foi concluída em 100/100 |
 | reverificação independente — **100/100 chaves ativas** via a CLI fornecida (`--verify-only`, saída nova, `deepseek-v4.1-flash` chat-200, 2026-10-20) |
-| nota do lado do painel | o registro limita com `429` em rajadas — a CLI espera ~25 s e tenta novamente; um e-mail que nunca chega (domínios de temp-mail compartilhados) passa para a próxima caixa |
+| nota do lado do painel | o registro limita com `429` em rajadas — a CLI espera ~25 s e tenta novamente; um e-mail que nunca chega (domínios de e-mail temporário compartilhados) passa para a próxima caixa |
 
 ```bash
 node src/cli.js --verify-only
@@ -122,8 +122,8 @@ inbox (one address per account)                                  a fresh address
 
 | Etapa | Chamada | Notas |
 | --- | --- | --- |
-| status | `GET /api/status` | gates de registro/e-mail/check-in (captcha desativado) |
-| caixa de correio | Emailnator `POST /api/generate-email` | um @gmail.com novo por conta (forma sem pontos) |
+| status | `GET /api/status` | portões de registro/e-mail/check-in (captcha desativado) |
+| caixa de correio | Emailnator `POST /api/generate-email` | um novo @gmail.com por conta (forma sem pontos) |
 | enviar código | `GET /api/verification?email=…` | código de 6 caracteres |
 | registrar | `POST /api/user/register` | 429 → espere, tente novamente o mesmo código novo |
 | login | `POST /api/user/login` | token de sessão |
@@ -149,13 +149,17 @@ node src/cli.js --help
 
 ## 🛰️ Atrás de um proxy
 
-**Obrigatório — sem fallback de conexão direta.** Toda requisição sai por uma saída; a limitação de registro do painel significa que um pool saudável é o que mantém uma execução andando.
+**Opcional — recomendado em escala (limites por IP, banimentos).** A ferramenta funciona sem proxy também.
+
+- **Com um pool:** passe `--pool <file>` (ou defina `SUANLICAT_PROXIES`) e toda requisição passa por uma saída dessa lista — uma linha morta faz aquela tentativa falhar e a ferramenta passa para a próxima (fail-closed enquanto um pool é fornecido; o pool é re-testado no uso).
+- **Sem um pool:** a CLI imprime `running WITHOUT a proxy (direct)` e conecta diretamente. Nada sobre cadastro, check-in, criação de chaves ou verificação muda — apenas de onde os pacotes saem.
+- Execute `--screen` em qualquer um dos modos: ele testa as saídas que você tem (ou a rota direta) contra o provedor antes de uma execução real.
 
 ## 📄 Arquivos
 
 | Caminho | Conteúdo |
 | --- | --- |
-| `keys.txt` | uma chave verificada ativa por linha — ignorado pelo git |
+| `keys.txt` | uma chave verificada como ativa por linha — ignorado pelo git |
 | `accounts.json` | username / e-mail / quotaStart / quotaAfterCheckin / group |
 | `proxies.txt` | suas saídas — ignorado pelo git |
 | `outputs/` | logs de execução — ignorado pelo git |
@@ -175,14 +179,14 @@ Padrões: `--prefix suanlicat`, `--base-url https://suanlicat.top/v1`, `--model 
 | | |
 | --- | --- |
 | 🏢 Provedor | **SuanliCat (算力狐)** — [suanlicat.top](https://suanlicat.top) |
-| 🎁 O que o provedor dá | $1 (100.000 unidades) no cadastro + ~13k/dia de check-in |
+| 🎁 O que o provedor dá | $1 (100.000 unidades) no cadastro + check-in de ~13k/dia |
 | 🔑 O que uma chave te dá | uma chave em sua própria conta, verificada por chat em `deepseek-v4.1-flash` |
 | 🌐 Formato da API | Compatível com OpenAI: `POST https://suanlicat.top/v1/chat/completions` |
 | 🔒 Seus dados | apenas `suanlicat.top` e seu backend de caixa de entrada são contatados |
 
 ## 🐞 Problemas
 
-Se o SuanliCat mudar seus gates de registro ou a recompensa de check-in, a ferramenta para ali e avisa. **[Abra uma issue](../../issues)** com o comando e a saída exata.
+Se o SuanliCat mudar seus portões de registro ou a recompensa de check-in, a ferramenta para ali e avisa. **[Abra uma issue](../../issues)** com o comando e a saída exata.
 
 ## 📄 Licença
 

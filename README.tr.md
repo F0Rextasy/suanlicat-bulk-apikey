@@ -11,7 +11,7 @@
 
 # suanlicat-bulk-apikey
 
-**Otomatik oluşturulan API anahtarlarıyla toplu SuanliCat hesabı açın — OpenAI uyumlu çıkarım + 9Router bağlayıcısı.**
+**Otomatik oluşturulan API anahtarlarıyla toplu SuanliCat hesabı oluşturun — OpenAI uyumlu çıkarım + 9Router bağlayıcısı.**
 
 [![Node](https://img.shields.io/badge/Node-%E2%89%A518-3DA639?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
 [![Dependencies](https://img.shields.io/badge/dependencies-0-blue?style=for-the-badge)](#)
@@ -34,20 +34,20 @@
 
 ## ✨ Bu neden var
 
-SuanliCat (算力狐) **her yeni hesaba 100.000 kota birimi (qpu=100.000 iken ≈ $1)** verir ve üstüne **günlük ~13.270 birim giriş ödemesi** yapar. Kayıt e-posta + 6 karakterli koddan oluşur, captcha yoktur; canlı anahtar satırı `deepseek-v4.1-flash`'tir ve aracın tamamı uçtan uca **100 hesap → 100 doğrulanmış anahtar** üretilerek kanıtlanmıştır.
+SuanliCat (算力狐) **her yeni hesaba 100.000 kota birimi (qpu=100.000 iken ≈ $1)** verir ve üstüne **günlük ~13.270 birim giriş ödemesi** yapar. Kayıt e-posta + 6 karakterli koddur, captcha yoktur; canlı anahtar satırı `deepseek-v4.1-flash`'tir ve tüm araç **100 hesap → 100 doğrulanmış anahtar** oluşturularak uçtan uca kanıtlanmıştır.
 
-## 🎁 Ücretsiz katman — ne kadar alıyorsunuz
+## 🎁 Ücretsiz katman — ne kadar alırsınız
 
 | Ne | Değer |
 | --- | --- |
 | Kayıt kredisi (`quotaStart`) | **100.000 birim ≈ $1** (qpu=100.000) |
-| Günlük giriş | **~+13.270 birim/gün** (ölçüldü; CLI anahtarını saklamadan önce hesap başına bir kez giriş yapar) |
+| Günlük giriş | **~+13.270 birim/gün** (ölçüldü; CLI anahtarını saklamadan önce her hesap için bir kez giriş yapar) |
 | Kayıt | e-posta + 6 karakterli kod — **captcha yok** (`turnstile_check: false`) |
 | Katalog | canlı fiyatlandırma sayfasında 17 model girdisi |
-| Hız limitleri | yoğunluk altında kayıt `429` yanıtı verir (`register refused`); CLI ~25 sn bekler ve aynı taze kodla yeniden dener |
+| Hız limitleri | yoğunlukta kayıt `429` yanıtı verir (`register refused`); CLI ~25 sn bekler ve aynı taze kodla yeniden dener |
 | Ölçeklenen birim | **bir hesap = bir anahtar** |
 
-> 💡 Ücretsiz katman SuanliCat (算力狐) tarafından belirlenir ve değişebilir. Canlı sayıları [suanlicat.top](https://suanlicat.top) adresinden kontrol edin — ve kararı aracın kendi kapısına bırakın:
+> 💡 Ücretsiz katman SuanliCat (算力狐) tarafından belirlenir ve değişebilir. Canlı sayıları [suanlicat.top](https://suanlicat.top) adresinden kontrol edin — ve aracın kendi kapısının karar vermesine izin verin:
 
 ```bash
 node src/cli.js --verify-only     # every key in keys.txt is re-tested with a real chat call
@@ -55,11 +55,11 @@ node src/cli.js --verify-only     # every key in keys.txt is re-tested with a re
 
 ## 🤖 Modeller — 17'sinin tamamı
 
-Canlı fiyatlandırma sayfasında **17 model girdisi** bulunur (`qwen-turbo`, `doubao-code`, `doubao-pro-max`, `coze-*`, `deepseek-*` …). Doğrulanmış anahtar satırı:
+Canlı fiyatlandırma sayfası **17 model girdisi** içerir (`qwen-turbo`, `doubao-code`, `doubao-pro-max`, `coze-*`, `deepseek-*` …). Doğrulanmış anahtar satırı:
 
 | Model Kimliği | Doğrulandı |
 | --- | --- |
-| `deepseek-v4.1-flash` | `providers/suanlicat/keys.txt` konumundaki üretim sırasında **100 anahtar chat-200**; gönderilen CLI ile bağımsız yeniden kontrol (bkz. Doğrulandı tablosu) |
+| `deepseek-v4.1-flash` | `providers/suanlicat/keys.txt` konumundaki oluşturma sırasında **100 anahtar chat-200**; gönderilen CLI ile bağımsız yeniden kontrol (bkz. Doğrulandı tablosu) |
 
 ```bash
 curl https://suanlicat.top/v1/chat/completions \
@@ -82,16 +82,16 @@ print(c.chat.completions.create(model="deepseek-v4.1-flash",
 
 ```bash
 cd suanlicat-bulk-apikey
-printf 'socks5://host:port\n' > proxies.txt
+printf 'socks5://host:port\n' > proxies.txt   # optional — without it the tool runs direct
 node src/launcher.js        # interactive: mint / verify / screen / settings
 # or: node src/cli.js --count 30    (check-in runs before the chat gate)
 ```
 
-Bir anahtar `keys.txt` dosyasına **yalnızca** `/v1/chat/completions` gerçek içerikle 200 yanıtı verdikten sonra yazılır; `accounts.json` kullanıcı adı / e-posta / quotaStart → quotaAfterCheckin / grup bilgisini saklar.
+Bir anahtar `keys.txt` dosyasına **yalnızca** `/v1/chat/completions` gerçek içerikle 200 yanıtı verdikten sonra yazılır; `accounts.json` kullanıcı adı / e-posta / quotaStart → quotaAfterCheckin / grup bilgisini tutar.
 
 ### 🖱️ Başlatıcı
 
-Başlatıcı proxy listesini ve sayıyı sorar, bunları hatırlar ve CLI'yi çalıştırır — üret, doğrula, çıkışları tara, ayarlar, yardım, 9Router'a Bağlan.
+Başlatıcı proxy listesini ve sayıyı sorar, bunları hatırlar ve CLI'yi çalıştırır — oluştur, doğrula, çıkışları tara, ayarlar, yardım, 9Router'a Bağlan.
 
 ## ✅ Çalıştığı doğrulandı — her anahtar test edilir
 
@@ -100,9 +100,9 @@ Başlatıcı proxy listesini ve sayıyı sorar, bunları hatırlar ve CLI'yi ça
 | `GET /api/status` | **200** — kayıt açık, e-posta doğrulama açık, captcha kapalı, giriş açık |
 | `POST /api/user/checkin` | **200** — günlük bonus hesaba geçer |
 | `POST /api/token/` (+ reveal) | **200** — anahtar materyali bir kez döndürülür |
-| `POST /v1/chat/completions` (`deepseek-v4.1-flash`) — yazılmadan önce **her** anahtar için | gerçek içerikle **200** — 100 anahtarlık üretim 100/100 tamamlandı |
+| `POST /v1/chat/completions` (`deepseek-v4.1-flash`) — yazılmadan önce **her** anahtar için | gerçek içerikle **200** — 100 anahtarlık oluşturma 100/100 tamamlandı |
 | bağımsız yeniden kontrol — gönderilen CLI ile **100/100 anahtar canlı** (`--verify-only`, temiz çıkış, `deepseek-v4.1-flash` chat-200, 2026-10-20) |
-| panel tarafı notu | kayıt yoğunluk altında `429` ile sınırlar — CLI ~25 sn bekler ve yeniden dener; hiç ulaşmayan bir e-posta (paylaşılan geçici posta alan adları) sonraki kutuya geçer |
+| panel tarafı notu | kayıt yoğunlukta `429` ile sınırlar — CLI ~25 sn bekler ve yeniden dener; hiç gelmeyen bir e-posta (paylaşılan geçici posta alan adları) sonraki kutuya geçer |
 
 ```bash
 node src/cli.js --verify-only
@@ -123,11 +123,11 @@ inbox (one address per account)                                  a fresh address
 | Adım | Çağrı | Notlar |
 | --- | --- | --- |
 | durum | `GET /api/status` | kayıt/e-posta/giriş kapıları (captcha kapalı) |
-| posta kutusu | Emailnator `POST /api/generate-email` | hesap başına bir taze @gmail.com (noktasız biçim) |
+| posta kutusu | Emailnator `POST /api/generate-email` | her hesap için bir taze @gmail.com (noktasız biçim) |
 | kod gönder | `GET /api/verification?email=…` | 6 karakterli kod |
 | kayıt | `POST /api/user/register` | 429 → bekle, aynı taze kodla yeniden dene |
 | giriş | `POST /api/user/login` | oturum belirteci |
-| günlük giriş | `POST /api/user/checkin` | günlük bonus |
+| giriş (check-in) | `POST /api/user/checkin` | günlük bonus |
 | anahtar | `POST /api/token/` (+ reveal) | bir kez yazılır |
 | kanıt | `POST /v1/chat/completions` | içerikle 200 = anahtar canlı |
 
@@ -149,7 +149,11 @@ node src/cli.js --help
 
 ## 🛰️ Proxy arkasında
 
-**Gerekli — doğrudan bağlantı yedeği yok.** Her istek bir çıkıştan geçer; panelin kayıt sınırlaması, sağlıklı bir havuzun bir çalışmayı ilerleten şey olduğu anlamına gelir.
+**İsteğe bağlı — ölçekte önerilir (IP başına limitler, yasaklar).** Araç proxy olmadan da çalışır.
+
+- **Havuzla:** `--pool <file>` geçin (veya `SUANLICAT_PROXIES` ayarlayın) ve her istek o listeden bir çıkıştan geçer — ölü bir hat o denemeyi başarısız kılar ve araç bir sonrakine geçer (havuz sağlandığında fail-closed; havuz kullanımda yeniden yoklanır).
+- **Havuz olmadan:** CLI `running WITHOUT a proxy (direct)` yazdırır ve doğrudan bağlanır. Kayıt, giriş, anahtar oluşturma veya doğrulama konusunda hiçbir şey değişmez — yalnızca paketlerin nereden çıktığı değişir.
+- Her iki moda karşı `--screen` çalıştırın: gerçek bir çalıştırmadan önce sahip olduğunuz çıkışları (veya doğrudan rotayı) sağlayıcıya karşı test eder.
 
 ## 📄 Dosyalar
 
@@ -182,7 +186,7 @@ Varsayılanlar: `--prefix suanlicat`, `--base-url https://suanlicat.top/v1`, `--
 
 ## 🐞 Sorunlar
 
-SuanliCat kayıt kapılarını veya günlük giriş ödülünü değiştirirse, araç orada durur ve bunu bildirir. Komut ve tam çıktıyla birlikte **[bir sorun açın](../../issues)**.
+SuanliCat kayıt kapılarını veya giriş ödülünü değiştirirse, araç orada durur ve bunu bildirir. Komut ve tam çıktıyla birlikte **[bir sorun açın](../../issues)**.
 
 ## 📄 Lisans
 
@@ -190,6 +194,6 @@ MIT © 2026 — bkz. [LICENSE](LICENSE).
 
 <div align="center">
 
-**[MIT](LICENSE)** © 2026 suanlicat-bulk-apikey katkıda bulunanlar
+**[MIT](LICENSE)** © 2026 suanlicat-bulk-apikey contributors
 
 </div>

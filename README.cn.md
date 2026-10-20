@@ -32,9 +32,9 @@
 
 ---
 
-## ✨ 为什么会有这个项目
+## ✨ 为什么有这个项目
 
-SuanliCat（算力狐）为**每个新账户发放 100,000 额度单位（按 qpu=100,000 计算约合 $1）**，并额外提供**每日签到约 13,270 单位**。注册只需邮箱 + 6 位验证码，无需验证码；当前可用的密钥线路是 `deepseek-v4.1-flash`，整个工具已通过铸造 **100 个账户 → 100 个已验证密钥** 完成端到端验证。
+SuanliCat（算力狐）为**每个新账户赠送 100,000 额度单位（按 qpu=100,000 计算约合 $1）**，并额外提供**每日签到约 13,270 单位**。注册只需邮箱 + 6 位验证码，无需验证码；当前可用的密钥线路为 `deepseek-v4.1-flash`，整个工具已通过端到端验证——成功铸造 **100 个账户 → 100 个已验证密钥**。
 
 ## 🎁 免费额度 — 你能获得多少
 
@@ -47,7 +47,7 @@ SuanliCat（算力狐）为**每个新账户发放 100,000 额度单位（按 qp
 | 速率限制 | 突发请求下注册接口返回 `429`（`register refused`）；CLI 会退避约 25 秒并使用同一个新验证码重试 |
 | 可扩展的单位 | **一个账户 = 一个密钥** |
 
-> 💡 免费额度由 SuanliCat（算力狐）设定，可能会变化。请在 [suanlicat.top](https://suanlicat.top) 查看实时数据 — 并让工具自身的校验来决定：
+> 💡 免费额度由 SuanliCat（算力狐）设定，可能发生变化。请前往 [suanlicat.top](https://suanlicat.top) 查看实时数据——并让工具自身的校验来决定：
 
 ```bash
 node src/cli.js --verify-only     # every key in keys.txt is re-tested with a real chat call
@@ -59,7 +59,7 @@ node src/cli.js --verify-only     # every key in keys.txt is re-tested with a re
 
 | 模型 ID | 已验证 |
 | --- | --- |
-| `deepseek-v4.1-flash` | 铸造期间在 `providers/suanlicat/keys.txt` 处 **100 个密钥 chat-200**；通过随附的 CLI 独立复核（见已验证表格） |
+| `deepseek-v4.1-flash` | 铸造期间在 `providers/suanlicat/keys.txt` 有 **100 个密钥 chat-200**；通过随附的 CLI 独立复检（见已验证表格） |
 
 ```bash
 curl https://suanlicat.top/v1/chat/completions \
@@ -82,27 +82,27 @@ print(c.chat.completions.create(model="deepseek-v4.1-flash",
 
 ```bash
 cd suanlicat-bulk-apikey
-printf 'socks5://host:port\n' > proxies.txt
+printf 'socks5://host:port\n' > proxies.txt   # optional — without it the tool runs direct
 node src/launcher.js        # interactive: mint / verify / screen / settings
 # or: node src/cli.js --count 30    (check-in runs before the chat gate)
 ```
 
-只有在 `/v1/chat/completions` 返回 200 且包含真实内容后，密钥才会被写入 `keys.txt`；`accounts.json` 保存用户名 / 邮箱 / quotaStart → quotaAfterCheckin / group。
+只有当 `/v1/chat/completions` 返回 200 且包含真实内容后，密钥才会被写入 `keys.txt`；`accounts.json` 保存用户名 / 邮箱 / quotaStart → quotaAfterCheckin / group。
 
 ### 🖱️ 启动器
 
-启动器会询问代理列表和数量，记住它们，并运行 CLI — 铸造、验证、筛选出口、设置、帮助、连接到 9Router。
+启动器会询问代理列表和数量，记住它们，并运行 CLI——铸造、验证、出口检测、设置、帮助、连接到 9Router。
 
 ## ✅ 已验证可用 — 每个密钥都经过测试
 
-| 检查 | 结果 |
+| 检查项 | 结果 |
 | --- | --- |
 | `GET /api/status` | **200** — 注册开启、邮箱验证开启、验证码关闭、签到开启 |
 | `POST /api/user/checkin` | **200** — 每日奖励到账 |
 | `POST /api/token/`（+ 显示） | **200** — 密钥材料仅返回一次 |
-| `POST /v1/chat/completions`（`deepseek-v4.1-flash`）— 对**每个**密钥在写入前 | **200** 且包含真实内容 — 100 个密钥的铸造以 100/100 完成 |
-| 独立复核 — 通过随附的 CLI **100/100 个密钥可用**（`--verify-only`，全新退出，`deepseek-v4.1-flash` chat-200，2026-10-20） |
-| 面板侧说明 | 突发请求下注册接口以 `429` 限流 — CLI 等待约 25 秒后重试；邮件始终未到达（共享临时邮箱域名）则切换到下一个邮箱 |
+| `POST /v1/chat/completions`（`deepseek-v4.1-flash`）— 对**每个**密钥在写入前执行 | **200** 且包含真实内容 — 100 个密钥的铸造以 100/100 完成 |
+| 独立复检 — 通过随附的 CLI **100/100 个密钥可用**（`--verify-only`，全新退出，`deepseek-v4.1-flash` chat-200，2026-10-20） |
+| 面板侧说明 | 注册在突发请求下会以 `429` 限流 — CLI 等待约 25 秒后重试；邮件始终未到达（共享临时邮箱域名）时会切换到下一个邮箱 |
 
 ```bash
 node src/cli.js --verify-only
@@ -147,9 +147,13 @@ node src/cli.js --help
 | `SUANLICAT_PROXIES` | `proxies.txt` | 出口池，每行一个代理 |
 | `SUANLICAT_MODEL` | `deepseek-v4.1-flash` | 用于实时验证的模型 |
 
-## 🛰️ 代理后面
+## 🛰️ 在代理后面
 
-**必需 — 无直连回退。** 每个请求都通过出口发出；面板的注册限流意味着健康的代理池是保持运行推进的关键。
+**可选 — 大规模使用时推荐（按 IP 限制、封禁）。** 该工具在没有代理的情况下也能工作。
+
+- **有代理池时：** 传入 `--pool <file>`（或设置 `SUANLICAT_PROXIES`），每个请求都会经过该列表中的一个出口——失效线路会使该次尝试失败，工具会切换到下一个（提供代理池时采用故障关闭策略；代理池在使用时会重新探测）。
+- **无代理池时：** CLI 会打印 `running WITHOUT a proxy (direct)` 并直接连接。注册、签到、密钥铸造或验证都不会改变——只是数据包的出口不同。
+- 对任一模式运行 `--screen`：它会在真实运行前针对提供商测试你拥有的出口（或直连路由）。
 
 ## 📄 文件
 
@@ -175,14 +179,14 @@ node src/connect-9router.js --base http://localhost:20128 --password 123456
 | | |
 | --- | --- |
 | 🏢 提供商 | **SuanliCat（算力狐）** — [suanlicat.top](https://suanlicat.top) |
-| 🎁 提供商提供什么 | 注册赠送 $1（100,000 单位）+ 每日签到约 13k |
+| 🎁 提供商赠送 | 注册赠送 $1（100,000 单位）+ 每日签到约 13k |
 | 🔑 一个密钥能给你什么 | 一个独立账户上的一个密钥，已在 `deepseek-v4.1-flash` 上通过聊天验证 |
 | 🌐 API 形式 | 兼容 OpenAI：`POST https://suanlicat.top/v1/chat/completions` |
 | 🔒 你的数据 | 仅联系 `suanlicat.top` 和你的邮箱后端 |
 
 ## 🐞 问题反馈
 
-如果 SuanliCat 更改其注册开关或签到奖励，工具会在此处停止并说明原因。请**[提交 issue](../../issues)**，附上命令和确切的输出。
+如果 SuanliCat 更改了其注册开关或签到奖励，工具会在此处停止并说明原因。请**[提交 issue](../../issues)**，附上命令和确切输出。
 
 ## 📄 许可证
 

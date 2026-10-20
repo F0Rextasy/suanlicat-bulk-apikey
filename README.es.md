@@ -34,7 +34,7 @@
 
 ## ✨ Por qué existe esto
 
-SuanliCat (算力狐) entrega **100.000 unidades de cuota (≈ $1 con qpu=100.000) a cada cuenta nueva** y además paga un **check-in diario de ~13.270 unidades**. El registro es correo electrónico + código de 6 caracteres, sin captcha; la línea de clave activa es `deepseek-v4.1-flash`, y toda la herramienta quedó probada de extremo a extremo acuñando **100 cuentas → 100 claves verificadas**.
+SuanliCat (算力狐) entrega **100.000 unidades de cuota (≈ $1 con qpu=100.000) a cada cuenta nueva** y además paga un **check-in diario de ~13.270 unidades**. El registro es correo electrónico + código de 6 caracteres, sin captcha; la línea de clave activa es `deepseek-v4.1-flash`, y toda la herramienta fue probada de extremo a extremo creando **100 cuentas → 100 claves verificadas**.
 
 ## 🎁 Nivel gratuito — cuánto obtienes
 
@@ -47,7 +47,7 @@ SuanliCat (算力狐) entrega **100.000 unidades de cuota (≈ $1 con qpu=100.00
 | Límites de velocidad | el registro responde `429` en ráfagas (`register refused`); la CLI espera ~25 s y reintenta con el mismo código recién obtenido |
 | La unidad que escala | **una cuenta = una clave** |
 
-> 💡 El nivel gratuito lo define SuanliCat (算力狐) y puede cambiar. Consulta los números activos en [suanlicat.top](https://suanlicat.top) — y deja que la propia verificación de la herramienta decida:
+> 💡 El nivel gratuito lo define SuanliCat (算力狐) y puede cambiar. Consulta los números en vivo en [suanlicat.top](https://suanlicat.top) — y deja que la propia verificación de la herramienta decida:
 
 ```bash
 node src/cli.js --verify-only     # every key in keys.txt is re-tested with a real chat call
@@ -59,7 +59,7 @@ La hoja de precios activa contiene **17 entradas de modelos** (`qwen-turbo`, `do
 
 | ID del modelo | Verificado |
 | --- | --- |
-| `deepseek-v4.1-flash` | **100 claves con chat-200** durante la acuñación en `providers/suanlicat/keys.txt`; reverificación independiente mediante la CLI incluida (consulta la tabla Verificado) |
+| `deepseek-v4.1-flash` | **100 claves con chat-200** durante la creación en `providers/suanlicat/keys.txt`; reverificación independiente mediante la CLI incluida (consulta la tabla Verificado) |
 
 ```bash
 curl https://suanlicat.top/v1/chat/completions \
@@ -82,16 +82,16 @@ print(c.chat.completions.create(model="deepseek-v4.1-flash",
 
 ```bash
 cd suanlicat-bulk-apikey
-printf 'socks5://host:port\n' > proxies.txt
+printf 'socks5://host:port\n' > proxies.txt   # optional — without it the tool runs direct
 node src/launcher.js        # interactive: mint / verify / screen / settings
 # or: node src/cli.js --count 30    (check-in runs before the chat gate)
 ```
 
-Una clave se escribe en `keys.txt` **solo** después de que `/v1/chat/completions` responde 200 con contenido real; `accounts.json` conserva username / correo electrónico / quotaStart → quotaAfterCheckin / grupo.
+Una clave se escribe en `keys.txt` **solo** después de que `/v1/chat/completions` responda 200 con contenido real; `accounts.json` conserva username / correo electrónico / quotaStart → quotaAfterCheckin / group.
 
 ### 🖱️ El lanzador
 
-El lanzador pide la lista de proxies y la cantidad, las recuerda y ejecuta la CLI — acuñar, verificar, cribar salidas, ajustes, ayuda, Conectar a 9Router.
+El lanzador pide la lista de proxies y la cantidad, las recuerda y ejecuta la CLI — crear, verificar, probar salidas, ajustes, ayuda, Conectar a 9Router.
 
 ## ✅ Verificado y funcionando — cada clave se prueba
 
@@ -100,9 +100,9 @@ El lanzador pide la lista de proxies y la cantidad, las recuerda y ejecuta la CL
 | `GET /api/status` | **200** — registro activado, verificación por correo activada, captcha desactivado, check-in activado |
 | `POST /api/user/checkin` | **200** — el bono diario llega a la cuenta |
 | `POST /api/token/` (+ reveal) | **200** — el material de la clave se devuelve una vez |
-| `POST /v1/chat/completions` (`deepseek-v4.1-flash`) — para **cada** clave antes de escribirla | **200** con contenido real — la acuñación de 100 claves se completó al 100/100 |
-| reverificación independiente — **100/100 claves activas** mediante la CLI incluida (`--verify-only`, salida nueva, chat-200 de `deepseek-v4.1-flash`, 2026-10-20) |
-| nota del lado del panel | el registro se limita con `429` en ráfagas — la CLI espera ~25 s y reintenta; un correo que nunca llega (dominios de correo temporal compartidos) pasa a la siguiente bandeja |
+| `POST /v1/chat/completions` (`deepseek-v4.1-flash`) — para **cada** clave antes de escribirse | **200** con contenido real — la creación de 100 claves se completó a 100/100 |
+| reverificación independiente — **100/100 claves activas** mediante la CLI incluida (`--verify-only`, salida nueva, `deepseek-v4.1-flash` chat-200, 2026-10-20) |
+| nota del panel | el registro limita con `429` en ráfagas — la CLI espera ~25 s y reintenta; un correo que nunca llega (dominios de correo temporal compartidos) pasa a la siguiente bandeja |
 
 ```bash
 node src/cli.js --verify-only
@@ -122,7 +122,7 @@ inbox (one address per account)                                  a fresh address
 
 | Paso | Llamada | Notas |
 | --- | --- | --- |
-| estado | `GET /api/status` | puertas de registro/correo/check-in (captcha desactivado) |
+| status | `GET /api/status` | puertas de registro/correo/check-in (captcha desactivado) |
 | buzón | Emailnator `POST /api/generate-email` | un @gmail.com nuevo por cuenta (forma sin puntos) |
 | enviar código | `GET /api/verification?email=…` | código de 6 caracteres |
 | registrar | `POST /api/user/register` | 429 → esperar, reintentar el mismo código recién obtenido |
@@ -149,20 +149,24 @@ node src/cli.js --help
 
 ## 🛰️ Detrás de un proxy
 
-**Obligatorio — sin respaldo de conexión directa.** Cada solicitud sale por una salida; la limitación de registro del panel hace que un grupo saludable sea lo que mantiene una ejecución en marcha.
+**Opcional — recomendado a escala (límites por IP, bloqueos).** La herramienta también funciona sin proxy.
+
+- **Con un grupo:** pasa `--pool <file>` (o define `SUANLICAT_PROXIES`) y cada solicitud sale por una salida de esa lista — una línea muerta hace fallar ese intento y la herramienta pasa a la siguiente (fail-closed mientras se proporciona un grupo; el grupo se vuelve a probar al usarse).
+- **Sin un grupo:** la CLI imprime `running WITHOUT a proxy (direct)` y se conecta directamente. Nada del registro, check-in, creación de claves o verificación cambia — solo desde dónde salen los paquetes.
+- Ejecuta `--screen` en cualquiera de los dos modos: prueba las salidas que tengas (o la ruta directa) contra el proveedor antes de una ejecución real.
 
 ## 📄 Archivos
 
 | Ruta | Contenido |
 | --- | --- |
 | `keys.txt` | una clave verificada en vivo por línea — ignorada por git |
-| `accounts.json` | username / correo electrónico / quotaStart / quotaAfterCheckin / grupo |
+| `accounts.json` | username / correo electrónico / quotaStart / quotaAfterCheckin / group |
 | `proxies.txt` | tus salidas — ignorado por git |
 | `outputs/` | registros de ejecución — ignorados por git |
 
 ## 🔌 Conectar a 9Router
 
-[9Router](https://9router.com) es un router autoalojado y compatible con OpenAI:
+[9Router](https://9router.com) es un router autoalojado compatible con OpenAI:
 
 ```bash
 node src/connect-9router.js --base http://localhost:20128 --password 123456
@@ -178,7 +182,7 @@ Predeterminados: `--prefix suanlicat`, `--base-url https://suanlicat.top/v1`, `-
 | 🎁 Qué da el proveedor | $1 (100.000 unidades) al registrarte + ~13k/día de check-in |
 | 🔑 Qué te da una clave | una clave en su propia cuenta, verificada por chat en `deepseek-v4.1-flash` |
 | 🌐 Forma de la API | Compatible con OpenAI: `POST https://suanlicat.top/v1/chat/completions` |
-| 🔒 Tus datos | solo se contacta a `suanlicat.top` y a tu backend de bandeja de entrada |
+| 🔒 Tus datos | solo se contacta con `suanlicat.top` y tu backend de buzón |
 
 ## 🐞 Problemas
 

@@ -33,15 +33,16 @@
  *   --group <name>   token group the key is created in   [default]
  *   --alt-groups G   fallback groups, comma separated
  *   --no-checkin     skip the daily check-in (it is on by default here)
- *   --pool <file>    proxy list, one exit per line  (env SUANLICAT_PROXIES)
+ *   --pool <file>    proxy list, one exit per line (env SUANLICAT_PROXIES) [optional]
  *   --tries N        exits tried per account before giving up           [2]
  *   --timeout MS     per-request timeout                             [60000]
  *   --verify-only    re-run every key in keys.txt through the chat gate
  *   --screen         only test the proxy list against SuanliCat
  *   --help
  *
- * Zero dependencies. Node.js >= 18. Nothing here talks to SuanliCat directly:
- * every request leaves through an exit from your pool.
+ * Zero dependencies. Node.js >= 18. Your proxy list is OPTIONAL: pass --pool
+ * (or the SUANLICAT_PROXIES env) and every request goes through an exit from it;
+ * without a pool the tool connects directly.
  */
 
 const fs = require('fs');
@@ -84,10 +85,10 @@ if (has('help') || has('h')) {
   --conc N       accounts in flight (max 8)                              [1]
   --model <id>   model used for the live gate         [deepseek-v4.1-flash]
   --group <name> token group the key is created in                   [default]
-  --pool <file>  proxy list, one exit per line    (env SUANLICAT_PROXIES)
+  --pool <file>  proxy list, one exit per line (env SUANLICAT_PROXIES) [optional]
 
-Every request leaves through an exit from your pool; the tool never dials
-SuanliCat directly.`);
+Requests go through the exits in your proxy list when one is provided (--pool
+or the SUANLICAT_PROXIES env). Without a pool the tool connects DIRECTLY.`);
   process.exit(0);
 }
 
@@ -123,6 +124,16 @@ function parseProxy(line) {
     return { protocol, host: m[4], port: Number(m[5]), auth: m[2] ? `${m[2]}:${m[3]}` : null, line: s };
   }
   return { protocol: 'http', host: m[3], port: Number(m[4]), auth: m[1] ? `${m[1]}:${m[2]}` : null, line: s };
+}
+
+/** A raw socket straight to host:port (no proxy) — the direct-mode twin of connectThrough. */
+function directConnect(host, port, timeoutMs) {
+  return new Promise((resolve, reject) => {
+    const sock = net.connect({ host, port });
+    const t = setTimeout(() => { sock.destroy(); reject(new Error(`connect timeout (${host}:${port})`)); }, timeoutMs);
+    sock.once('error', (e) => { clearTimeout(t); try { sock.destroy(); } catch {} reject(new Error(`connect failed: ${e.message}`)); });
+    sock.once('connect', () => { clearTimeout(t); resolve(sock); });
+  });
 }
 
 function connectThrough(proxy, host, port, timeoutMs) {
@@ -198,7 +209,7 @@ function connectThrough(proxy, host, port, timeoutMs) {
 /** One HTTPS request through one exit. Returns { status, headers, body }. */
 async function exitFetch(proxy, url, { method = 'GET', headers = {}, body = null, timeoutMs = TIMEOUT_MS } = {}) {
   const u = new URL(url);
-  const raw = await connectThrough(proxy, u.hostname, u.port || 443, timeoutMs);
+  const raw = proxy ? await connectThrough(proxy, u.hostname, u.port || 443, timeoutMs) : await directConnect(u.hostname, u.port || 443, timeoutMs);
   const sock = tls.connect({ socket: raw, servername: u.hostname });
   await new Promise((res, rej) => { sock.once('secureConnect', res); sock.once('error', rej); });
   const chunks = [];
@@ -241,11 +252,16 @@ function loadExits() {
   const poolArg = arg('pool', process.env.SUANLICAT_PROXIES || 'proxies.txt');
   const poolFile = fs.existsSync(path.resolve(poolArg)) ? path.resolve(poolArg) : path.resolve(ROOT, poolArg);
   if (!fs.existsSync(poolFile)) {
-    console.error(`no exit list at ${poolFile}\n  one exit per line, e.g. socks5://host:port — see README "Behind a proxy"`);
-    process.exit(2);
+    // No pool = DIRECT mode: a proxy is recommended at scale (per-IP limits,
+    // bans) but the tool works without one. `null` is the direct sentinel.
+    console.log(`no proxy list at ${poolFile} — running WITHOUT a proxy (direct). Put exits there (or pass --pool) to route through them.`);
+    return [null];
   }
   const exits = fs.readFileSync(poolFile, 'utf8').split(/\r?\n/).map(parseProxy).filter(Boolean);
-  if (!exits.length) { console.error(`${poolFile} has no usable exits (comment lines do not count)`); process.exit(2); }
+  if (!exits.length) {
+    console.log(`${poolFile} has no usable exits — running WITHOUT a proxy (direct).`);
+    return [null];
+  }
   return exits;
 }
 
@@ -257,9 +273,9 @@ async function screen(exits) {
       const r = await exitFetch(e, `${BASE}/api/status`, { timeoutMs: 20000 });
       const good = r.status === 200 && /"success"/.test(r.body);
       if (good) ok++;
-      console.log(`  ${good ? '✔' : '✘'} ${e.host}:${e.port} status=${r.status} ${Date.now() - t0}ms`);
+      console.log(`  ${good ? '✔' : '✘'} ${e ? `${e.host}:${e.port}` : 'direct'} status=${r.status} ${Date.now() - t0}ms`);
     } catch (err) {
-      console.log(`  ✘ ${e.host}:${e.port} ${String(err.message).slice(0, 80)}`);
+      console.log(`  ✘ ${e ? `${e.host}:${e.port}` : 'direct'} ${String(err.message).slice(0, 80)}`);
     }
   }
   console.log(`screened ${Math.min(exits.length, 64)} exit(s): ${ok} reach ${BASE}`);
@@ -399,7 +415,7 @@ async function mint() {
   const exits = loadExits();
   if (SCREEN) return void (await screen(exits));
   const accounts = loadAccounts();
-  log(`weytoken · ${COUNT} key(s) · conc ${CONC} · exits ${exits.length} · keys land in keys.txt`);
+  log(`weytoken · ${COUNT} key(s) · conc ${CONC} · exits ${exits.filter(Boolean).length || 'direct'} · keys land in keys.txt`);
   let made = 0;
   for (let round = 0; round < COUNT; round += CONC) {
     const jobs = [];
@@ -415,12 +431,12 @@ async function mint() {
             const g = await chatGate(exit, rec.key);
             if (!g.ok) {
               lastErr = new Error(`chat gate ${g.status}: ${g.sample}`);
-              accounts.push({ at: new Date().toISOString(), username: rec.username, email: rec.box.plain, exit: `${exit.host}:${exit.port}`, gate: g.status });
+              accounts.push({ at: new Date().toISOString(), username: rec.username, email: rec.box.plain, exit: exit ? `${exit.host}:${exit.port}` : 'direct', gate: g.status });
               saveAccounts(accounts);
               continue;
             }
             appendKey(rec.key);
-            accounts.push({ at: new Date().toISOString(), username: rec.username, email: rec.box.plain, uid: rec.uid, quota: rec.quota, quotaAfterCheckin: rec.quotaAfterCheckin ?? null, checkin: rec.checkin ?? null, group: rec.usedGroup ?? null, exit: `${exit.host}:${exit.port}`, key_masked: `${rec.key.slice(0, 8)}…`, gate: 200 });
+            accounts.push({ at: new Date().toISOString(), username: rec.username, email: rec.box.plain, uid: rec.uid, quota: rec.quota, quotaAfterCheckin: rec.quotaAfterCheckin ?? null, checkin: rec.checkin ?? null, group: rec.usedGroup ?? null, exit: exit ? `${exit.host}:${exit.port}` : 'direct', key_masked: `${rec.key.slice(0, 8)}…`, gate: 200 });
             saveAccounts(accounts);
             made++;
             log(`account ${i + 1} ✔ chat-200 ${MODEL} · ${rec.usedGroup || '?'} · quota ${rec.quota}${rec.quotaAfterCheckin ? ` → ${rec.quotaAfterCheckin} (checkin ${rec.checkin})` : ''} · ${rec.key.slice(0, 8)}…`);

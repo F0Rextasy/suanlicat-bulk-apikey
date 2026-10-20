@@ -11,7 +11,7 @@
 
 # suanlicat-bulk-apikey
 
-**SuanliCat アカウントを自動生成された API キーとともに一括作成 — OpenAI 互換の推論 + 9Router コネクタ。**
+**自動生成された API キーで SuanliCat アカウントを一括作成 — OpenAI 互換の推論 + 9Router コネクタ。**
 
 [![Node](https://img.shields.io/badge/Node-%E2%89%A518-3DA639?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
 [![Dependencies](https://img.shields.io/badge/dependencies-0-blue?style=for-the-badge)](#)
@@ -34,9 +34,9 @@
 
 ## ✨ これが存在する理由
 
-SuanliCat（算力狐）は**新規アカウントごとに 100,000 クォータ単位（qpu=100,000 で約 $1）**を付与し、さらに**毎日のチェックインで約 13,270 単位**を支払います。登録はメールアドレス + 6 文字のコードで、キャプチャはありません。稼働中のキーラインは `deepseek-v4.1-flash` で、ツール全体は**100 アカウントを作成 → 100 個の検証済みキー**という形でエンドツーエンドで実証されました。
+SuanliCat（算力狐）は**新規アカウントごとに 100,000 クォータ単位（qpu=100,000 で約 $1）**を配布し、さらに**毎日のチェックインで約 13,270 単位**を支払います。登録はメールアドレス + 6 文字のコードで、キャプチャなし。稼働中のキーラインは `deepseek-v4.1-flash` で、ツール全体は**100 アカウント → 100 個の検証済みキー**を発行してエンドツーエンドで実証されました。
 
-## 🎁 無料枠 — いくらもらえるか
+## 🎁 無料枠 — どれだけ得られるか
 
 | 項目 | 値 |
 | --- | --- |
@@ -44,22 +44,22 @@ SuanliCat（算力狐）は**新規アカウントごとに 100,000 クォータ
 | 毎日のチェックイン | **約 +13,270 単位/日**（実測値。CLI はキーを保持する前にアカウントごとに 1 回チェックインします） |
 | 登録 | メールアドレス + 6 文字のコード — **キャプチャなし**（`turnstile_check: false`） |
 | カタログ | 稼働中の料金表に 17 のモデルエントリ |
-| レート制限 | 登録はバースト時に `429` を返します（`register refused`）。CLI は約 25 秒バックオフし、同じ新しいコードで再試行します |
+| レート制限 | バースト時に register が `429` を返します（`register refused`）。CLI は約 25 秒バックオフし、同じ新しいコードで再試行します |
 | スケールする単位 | **1 アカウント = 1 キー** |
 
-> 💡 無料枠は SuanliCat（算力狐）が設定するもので、変更される可能性があります。最新の数値は [suanlicat.top](https://suanlicat.top) で確認してください — そしてツール自身のゲートに判断させましょう:
+> 💡 無料枠は SuanliCat（算力狐）が設定しており、変更される可能性があります。最新の数値は [suanlicat.top](https://suanlicat.top) で確認してください — そしてツール自身のゲートに判断させましょう：
 
 ```bash
 node src/cli.js --verify-only     # every key in keys.txt is re-tested with a real chat call
 ```
 
-## 🤖 モデル — 全 17 個
+## 🤖 モデル — 全 17 種
 
-稼働中の料金表には **17 のモデルエントリ**（`qwen-turbo`、`doubao-code`、`doubao-pro-max`、`coze-*`、`deepseek-*` …）が含まれています。検証済みのキーライン:
+稼働中の料金表には **17 のモデルエントリ**（`qwen-turbo`、`doubao-code`、`doubao-pro-max`、`coze-*`、`deepseek-*` …）が含まれています。検証済みのキーライン：
 
 | モデル ID | 検証済み |
 | --- | --- |
-| `deepseek-v4.1-flash` | `providers/suanlicat/keys.txt` での作成時に **100 キーが chat-200**。同梱の CLI による独立した再チェック（検証済みテーブルを参照） |
+| `deepseek-v4.1-flash` | `providers/suanlicat/keys.txt` での発行時に **100 キーが chat-200**。同梱の CLI による独立した再チェック（検証済みテーブルを参照） |
 
 ```bash
 curl https://suanlicat.top/v1/chat/completions \
@@ -82,27 +82,27 @@ print(c.chat.completions.create(model="deepseek-v4.1-flash",
 
 ```bash
 cd suanlicat-bulk-apikey
-printf 'socks5://host:port\n' > proxies.txt
+printf 'socks5://host:port\n' > proxies.txt   # optional — without it the tool runs direct
 node src/launcher.js        # interactive: mint / verify / screen / settings
 # or: node src/cli.js --count 30    (check-in runs before the chat gate)
 ```
 
-キーは `/v1/chat/completions` が実際のコンテンツとともに 200 を返した**後にのみ** `keys.txt` に書き込まれます。`accounts.json` はユーザー名 / メールアドレス / quotaStart → quotaAfterCheckin / グループを保持します。
+キーは `/v1/chat/completions` が実際のコンテンツとともに 200 を返した**後にのみ** `keys.txt` に書き込まれます。`accounts.json` は username / e-mail / quotaStart → quotaAfterCheckin / group を保持します。
 
 ### 🖱️ ランチャー
 
-ランチャーはプロキシリストと件数を尋ね、それらを記憶し、CLI を実行します — 作成、検証、終了のスクリーニング、設定、ヘルプ、9Router への接続。
+ランチャーはプロキシリストと件数を尋ね、それらを記憶して CLI を実行します — mint、verify、screen exits、settings、help、Connect to 9Router。
 
 ## ✅ 動作検証済み — すべてのキーがテストされています
 
 | チェック | 結果 |
 | --- | --- |
-| `GET /api/status` | **200** — 登録オン、メール認証オン、キャプチャオフ、チェックインオン |
-| `POST /api/user/checkin` | **200** — 毎日のボーナスがアカウントに付与される |
-| `POST /api/token/`（+ reveal） | **200** — キーマテリアルが一度だけ返される |
-| `POST /v1/chat/completions`（`deepseek-v4.1-flash`）— 書き込まれる前の**すべての**キーに対して | 実際のコンテンツとともに **200** — 100 キーの作成が 100/100 で完了 |
-| 独立した再チェック — 同梱の CLI による **100/100 キーが稼働中**（`--verify-only`、新規終了、`deepseek-v4.1-flash` chat-200、2026-10-20） |
-| パネル側の注記 | 登録はバースト時に `429` でスロットルします — CLI は約 25 秒待って再試行します。届かないメール（共有の一時メールドメイン）は次のボックスに移ります |
+| `GET /api/status` | **200** — register オン、メール認証 オン、キャプチャ オフ、チェックイン オン |
+| `POST /api/user/checkin` | **200** — 毎日のボーナスがアカウントに付与されます |
+| `POST /api/token/`（+ reveal） | **200** — キーマテリアルが一度だけ返されます |
+| `POST /v1/chat/completions`（`deepseek-v4.1-flash`）— 書き込まれる前の**すべての**キーに対して | 実際のコンテンツとともに **200** — 100 キーの発行が 100/100 で完了 |
+| 独立した再チェック — 同梱の CLI 経由で **100/100 キーが稼働**（`--verify-only`、新規終了、`deepseek-v4.1-flash` chat-200、2026-10-20） |
+| パネル側の注記 | register はバースト時に `429` でスロットルします — CLI は約 25 秒待って再試行します。届かないメール（共有の一時メールドメイン）は次のボックスに移ります |
 
 ```bash
 node src/cli.js --verify-only
@@ -122,13 +122,13 @@ inbox (one address per account)                                  a fresh address
 
 | ステップ | 呼び出し | 備考 |
 | --- | --- | --- |
-| status | `GET /api/status` | 登録/メール/チェックインのゲート（キャプチャオフ） |
+| status | `GET /api/status` | register/メール/チェックインのゲート（キャプチャ オフ） |
 | mailbox | Emailnator `POST /api/generate-email` | アカウントごとに 1 つの新しい @gmail.com（ドットなし形式） |
 | send code | `GET /api/verification?email=…` | 6 文字のコード |
 | register | `POST /api/user/register` | 429 → 待機し、同じ新しいコードで再試行 |
 | login | `POST /api/user/login` | セッショントークン |
 | check-in | `POST /api/user/checkin` | 毎日のボーナス |
-| key | `POST /api/token/`（+ reveal） | 一度だけ書き込まれる |
+| key | `POST /api/token/`（+ reveal） | 一度だけ書き込み |
 | proof | `POST /v1/chat/completions` | コンテンツとともに 200 = キーが稼働中 |
 
 ## ⚙️ CLI オプション
@@ -144,31 +144,35 @@ node src/cli.js --help
 
 | 環境変数 | デフォルト | 意味 |
 | --- | --- | --- |
-| `SUANLICAT_PROXIES` | `proxies.txt` | 終了プール、プロキシごとに 1 行 |
-| `SUANLICAT_MODEL` | `deepseek-v4.1-flash` | ライブ検証用のモデル |
+| `SUANLICAT_PROXIES` | `proxies.txt` | 出口プール、プロキシごとに 1 行 |
+| `SUANLICAT_MODEL` | `deepseek-v4.1-flash` | ライブ検証に使用するモデル |
 
 ## 🛰️ プロキシの背後で
 
-**必須 — 直接接続のフォールバックはありません。** すべてのリクエストは終了ノードを経由して送信されます。パネルの登録スロットリングにより、健全なプールが実行を進め続ける鍵となります。
+**任意 — 大規模運用では推奨（IP ごとの制限、BAN）。** このツールはプロキシなしでも動作します。
+
+- **プールあり：** `--pool <file>` を渡す（または `SUANLICAT_PROXIES` を設定する）と、すべてのリクエストがそのリストの出口を経由します — 死んだ回線はその試行を失敗させ、ツールは次の回線に移ります（プールが提供されている間はフェイルクローズ。プールは使用時に再プローブされます）。
+- **プールなし：** CLI は `running WITHOUT a proxy (direct)` と表示し、直接接続します。登録、チェックイン、キー発行、検証のいずれも変わりません — 変わるのはパケットが出ていく場所だけです。
+- どちらのモードでも `--screen` を実行してください：実際の実行前に、持っている出口（または直接ルート）をプロバイダーに対してテストします。
 
 ## 📄 ファイル
 
 | パス | 内容 |
 | --- | --- |
 | `keys.txt` | 1 行につき 1 つのライブ検証済みキー — git 無視 |
-| `accounts.json` | ユーザー名 / メールアドレス / quotaStart / quotaAfterCheckin / グループ |
-| `proxies.txt` | あなたの終了ノード — git 無視 |
+| `accounts.json` | username / e-mail / quotaStart / quotaAfterCheckin / group |
+| `proxies.txt` | あなたの出口 — git 無視 |
 | `outputs/` | 実行ログ — git 無視 |
 
-## 🔌 9Router への接続
+## 🔌 9Router に接続
 
-[9Router](https://9router.com) はセルフホスト型の OpenAI 互換ルーターです:
+[9Router](https://9router.com) はセルフホスト型の OpenAI 互換ルーターです：
 
 ```bash
 node src/connect-9router.js --base http://localhost:20128 --password 123456
 ```
 
-デフォルト: `--prefix suanlicat`、`--base-url https://suanlicat.top/v1`、`--model deepseek-v4.1-flash`。モデルは `suanlicat/<model id>` として提供されます。
+デフォルト：`--prefix suanlicat`、`--base-url https://suanlicat.top/v1`、`--model deepseek-v4.1-flash`。モデルは `suanlicat/<model id>` として提供されます。
 
 ## 🔑 1 つのキーで得られるもの
 
@@ -177,8 +181,8 @@ node src/connect-9router.js --base http://localhost:20128 --password 123456
 | 🏢 プロバイダー | **SuanliCat（算力狐）** — [suanlicat.top](https://suanlicat.top) |
 | 🎁 プロバイダーが提供するもの | 登録時に $1（100,000 単位）+ 約 13k/日のチェックイン |
 | 🔑 1 つのキーで得られるもの | 独自のアカウント上の 1 つのキー、`deepseek-v4.1-flash` でチャット検証済み |
-| 🌐 API 形式 | OpenAI 互換: `POST https://suanlicat.top/v1/chat/completions` |
-| 🔒 あなたのデータ | `suanlicat.top` とあなたの受信トレイバックエンドのみが接触されます |
+| 🌐 API 形式 | OpenAI 互換：`POST https://suanlicat.top/v1/chat/completions` |
+| 🔒 あなたのデータ | 接触するのは `suanlicat.top` とあなたの受信トレイバックエンドのみ |
 
 ## 🐞 問題報告
 
