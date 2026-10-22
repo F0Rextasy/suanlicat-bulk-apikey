@@ -34,7 +34,7 @@
 
 ## ✨ Why this exists
 
-SuanliCat (算力狐) hands out **100,000 quota units (≈ $1 at qpu=100,000) to every new account** and pays a **daily check-in of ~13,270 units** on top. Registration is e-mail + 6-char code, captcha-free; the live key line is `deepseek-v4.1-flash`, and the whole tool was proven end-to-end by minting **100 accounts → 100 verified keys**.
+SuanliCat (算力狐) hands out **100,000 quota units (≈ $1 at qpu=100,000) to every new account** and pays a **daily check-in of ~13,270 units** on top. Registration is e-mail + 6-char code, captcha-free; the verified keys line is `deepseek-v4.1-flash`, and the whole tool was proven end-to-end by minting **100 accounts → 100 verified keys**.
 
 ## 🎁 Free tier — how much you get
 
@@ -59,7 +59,7 @@ The live pricing sheet carries **17 model entries** (`qwen-turbo`, `doubao-code`
 
 | Model ID | Verified |
 | --- | --- |
-| `deepseek-v4.1-flash` | **100 keys chat-200** during the mint at `providers/suanlicat/keys.txt`; independent re-check via the shipped CLI (see the Verified table) |
+| `deepseek-v4.1-flash` | **chat-200** during the mint at `providers/suanlicat/keys.txt`; independent re-check via the shipped CLI (see the Verified table) |
 
 ```bash
 curl https://suanlicat.top/v1/chat/completions \
@@ -101,7 +101,7 @@ The launcher asks for the proxy list and count, remembers them, and runs the CLI
 | `POST /api/user/checkin` | **200** — daily bonus lands on the account |
 | `POST /api/token/` (+ reveal) | **200** — key material returned once |
 | `POST /v1/chat/completions` (`deepseek-v4.1-flash`) — for **every** key before it is written | **200** with real content — the 100-key mint completed at 100/100 |
-| independent re-check — **100/100 keys live** via the shipped CLI (`--verify-only`, fresh exit, `deepseek-v4.1-flash` chat-200, 2026-10-20) |
+| independent re-check — **verified working** via the shipped CLI (`--verify-only`, fresh exit, `deepseek-v4.1-flash` chat-200, 2026-10-20) |
 | panel-side note | register throttles with `429` under burst — the CLI waits ~25 s and retries; a mail that never arrives (shared temp-mail domains) moves to the next box |
 
 ```bash
