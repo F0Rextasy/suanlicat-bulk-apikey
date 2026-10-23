@@ -21,7 +21,7 @@
 [![OmniRoute](https://img.shields.io/badge/OmniRoute-connector-8B5CF6?style=for-the-badge)](#-connect-to-omniroute)
 [![X](https://img.shields.io/badge/X-%40bigbullapp-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/bigbullapp)
 
-[🛠 Démarrage rapide](#-quick-start) · [🎁 Offre gratuite](#-free-tier--how-much-you-get) · [🤖 Modèles](#-models--all-17-of-them) · [🧪 Utiliser l'API](#-how-to-use-the-api) · [✅ Vérifié](#-verified-working--every-key-is-tested) · [🧭 Comment ça marche](#-how-it-works) · [🔌 9Router](#-connect-to-9router) · [⚙️ Options](#️-cli-options) · [🛰️ Proxys](#️-behind-a-proxy) · [🐞 Problèmes](#-issues)
+[🛠 Démarrage rapide](#-quick-start) · [🎁 Offre gratuite](#-free-tier--how-much-you-get) · [🤖 Modèles](#-models--all-17-of-them) · [🧪 Utiliser l'API](#-how-to-use-the-api) · [✅ Vérifié](#-verified-working--every-key-is-tested) · [🧭 Comment ça marche](#-how-it-works) · [🔌 9Router](#-connect-to-9router) · [🔌 OmniRoute](#-connect-to-omniroute) · [⚙️ Options](#️-cli-options) · [🛰️ Proxys](#️-behind-a-proxy) · [🐞 Problèmes](#-issues)
 
 </div>
 
@@ -35,18 +35,18 @@
 
 ## ✨ Pourquoi cet outil existe
 
-SuanliCat (算力狐) offre **100 000 unités de quota (≈ 1 $ à qpu=100 000) à chaque nouveau compte** et verse en plus un **check-in quotidien d'environ 13 270 unités**. L'inscription se fait par e-mail + code à 6 caractères, sans captcha ; la ligne de clé active est `deepseek-v4.1-flash`, et l'outil entier a été prouvé de bout en bout en créant **100 comptes → 100 clés vérifiées**.
+SuanliCat (算力狐) offre **100 000 unités de quota (≈ 1 $ à qpu=100 000) à chaque nouveau compte** et verse en plus un **bonus de connexion quotidien d'environ 13 270 unités**. L'inscription se fait par e-mail + code à 6 caractères, sans captcha ; la ligne de clé active est `deepseek-v4.1-flash`, et l'outil entier a été prouvé de bout en bout en créant **100 comptes → 100 clés vérifiées**.
 
 ## 🎁 Offre gratuite — ce que vous obtenez
 
 | Quoi | Valeur |
 | --- | --- |
 | Crédit d'inscription (`quotaStart`) | **100 000 unités ≈ 1 $** (qpu=100 000) |
-| Check-in quotidien | **~+13 270 unités/jour** (mesuré ; le CLI effectue un check-in par compte avant de conserver sa clé) |
+| Connexion quotidienne | **~+13 270 unités/jour** (mesuré ; le CLI effectue une connexion par compte avant de conserver sa clé) |
 | Inscription | e-mail + code à 6 caractères — **sans captcha** (`turnstile_check: false`) |
-| Catalogue | 17 entrées de modèles sur la grille tarifaire active |
+| Catalogue | 17 entrées de modèles sur la grille tarifaire en ligne |
 | Limites de débit | l'inscription répond `429` en cas de rafale (`register refused`) ; le CLI attend ~25 s et réessaie avec le même code frais |
-| L'unité qui passe à l'échelle | **un compte = une clé** |
+| L'unité qui monte en échelle | **un compte = une clé** |
 
 > 💡 L'offre gratuite est définie par SuanliCat (算力狐) et peut changer. Consultez les chiffres en direct sur [suanlicat.top](https://suanlicat.top) — et laissez le contrôle de l'outil décider :
 
@@ -54,13 +54,13 @@ SuanliCat (算力狐) offre **100 000 unités de quota (≈ 1 $ à qpu=100 000) 
 node src/cli.js --verify-only     # every key in keys.txt is re-tested with a real chat call
 ```
 
-## 🤖 Modèles — les 17
+## 🤖 Modèles — les 17 au complet
 
-La grille tarifaire active contient **17 entrées de modèles** (`qwen-turbo`, `doubao-code`, `doubao-pro-max`, `coze-*`, `deepseek-*` …). La ligne de clé vérifiée :
+La grille tarifaire en ligne comporte **17 entrées de modèles** (`qwen-turbo`, `doubao-code`, `doubao-pro-max`, `coze-*`, `deepseek-*` …). La ligne de clé vérifiée :
 
 | ID du modèle | Vérifié |
 | --- | --- |
-| `deepseek-v4.1-flash` | **100 clés chat-200** lors de la création dans `providers/suanlicat/keys.txt` ; re-vérification indépendante via le CLI fourni (voir le tableau Vérifié) |
+| `deepseek-v4.1-flash` | **chaque clé, chat-200** lors de la création dans `providers/suanlicat/keys.txt` ; re-vérification indépendante via le CLI fourni (voir le tableau Vérifié) |
 
 ```bash
 curl https://suanlicat.top/v1/chat/completions \
@@ -99,17 +99,23 @@ Le lanceur demande la liste de proxys et le nombre, les mémorise, et exécute l
 
 | Vérification | Résultat |
 | --- | --- |
-| `GET /api/status` | **200** — inscription activée, vérification e-mail activée, captcha désactivé, check-in activé |
+| `GET /api/status` | **200** — inscription activée, vérification par e-mail activée, captcha désactivé, connexion activée |
 | `POST /api/user/checkin` | **200** — le bonus quotidien est crédité sur le compte |
-| `POST /api/token/` (+ reveal) | **200** — le matériel de clé est renvoyé une fois |
-| `POST /v1/chat/completions` (`deepseek-v4.1-flash`) — pour **chaque** clé avant son écriture | **200** avec du contenu réel — la création de 100 clés s'est terminée à 100/100 |
-| re-vérification indépendante — **100/100 clés actives** via le CLI fourni (`--verify-only`, sortie fraîche, `deepseek-v4.1-flash` chat-200, 2026-10-20) |
+| `POST /api/token/` (+ reveal) | **200** — le matériel de clé est renvoyé une seule fois |
+| `POST /v1/chat/completions` (`deepseek-v4.1-flash`) — pour **chaque** clé avant son écriture | **200** avec du contenu réel — la création des 100 clés s'est terminée à 100/100 |
+| re-vérification indépendante — **chaque clé vérifiée** via le CLI fourni (`--verify-only`, sortie fraîche, `deepseek-v4.1-flash` chat-200, 2026-10-20) |
 | note côté panneau | l'inscription limite avec `429` en cas de rafale — le CLI attend ~25 s et réessaie ; un e-mail qui n'arrive jamais (domaines de temp-mail partagés) passe à la boîte suivante |
 
 ```bash
 node src/cli.js --verify-only
 node src/cli.js --screen
 ```
+
+> **Contrôles qualité.** Chaque clé ici a passé un `chat-200` en direct avant d'être écrite dans `keys.txt`
+> (les clés mortes ne sont jamais livrées). Les combinaisons de routeur suivent la même règle au niveau du modèle : une entrée est
+> ajoutée **uniquement si le modèle répond `chat-200` et peut appeler des outils** — un modèle sans prise en charge des outils,
+> une clé morte ou un fournisseur mort est écarté plutôt qu'ajouté. Relancez l'étape de vérification à tout moment ;
+> les échecs sont signalés, jamais masqués.
 
 ## 🧭 Comment ça marche
 
@@ -122,16 +128,16 @@ inbox (one address per account)                                  a fresh address
    └─▶ live proof: POST https://suanlicat.top/v1/chat/completions → real content = the key is live
 ```
 
-| Étape | Appel | Notes |
+| Étape | Appel | Remarques |
 | --- | --- | --- |
-| status | `GET /api/status` | portes inscription/e-mail/check-in (captcha désactivé) |
-| boîte mail | Emailnator `POST /api/generate-email` | un nouveau @gmail.com par compte (forme sans point) |
-| envoi du code | `GET /api/verification?email=…` | code à 6 caractères |
-| inscription | `POST /api/user/register` | 429 → attendre, réessayer avec le même code frais |
-| connexion | `POST /api/user/login` | jeton de session |
+| status | `GET /api/status` | conditions d'inscription/e-mail/connexion (captcha désactivé) |
+| mailbox | Emailnator `POST /api/generate-email` | un @gmail.com frais par compte (forme sans point) |
+| send code | `GET /api/verification?email=…` | code à 6 caractères |
+| register | `POST /api/user/register` | 429 → attendre, réessayer avec le même code frais |
+| login | `POST /api/user/login` | jeton de session |
 | check-in | `POST /api/user/checkin` | le bonus quotidien |
-| clé | `POST /api/token/` (+ reveal) | écrite une fois |
-| preuve | `POST /v1/chat/completions` | 200 avec contenu = la clé est active |
+| key | `POST /api/token/` (+ reveal) | écrit une seule fois |
+| proof | `POST /v1/chat/completions` | 200 avec contenu = la clé est active |
 
 ## ⚙️ Options du CLI
 
@@ -151,10 +157,10 @@ node src/cli.js --help
 
 ## 🛰️ Derrière un proxy
 
-**Optionnel — recommandé à grande échelle (limites par IP, bannissements).** L'outil fonctionne aussi sans proxy.
+**Facultatif — recommandé à grande échelle (limites par IP, bannissements).** L'outil fonctionne aussi sans proxy.
 
-- **Avec un pool :** passez `--pool <file>` (ou définissez `SUANLICAT_PROXIES`) et chaque requête passe par une sortie de cette liste — une ligne morte fait échouer cette tentative et l'outil passe à la suivante (fail-closed tant qu'un pool est fourni ; le pool est re-testé à l'usage).
-- **Sans pool :** le CLI affiche `running WITHOUT a proxy (direct)` et se connecte directement. Rien ne change pour l'inscription, le check-in, la création de clés ou la vérification — seul le point de sortie des paquets diffère.
+- **Avec un pool :** passez `--pool <file>` (ou définissez `SUANLICAT_PROXIES`) et chaque requête passe par une sortie de cette liste — une ligne morte fait échouer cette tentative et l'outil passe à la suivante (échec fermé tant qu'un pool est fourni ; le pool est re-testé à l'usage).
+- **Sans pool :** le CLI affiche `running WITHOUT a proxy (direct)` et se connecte directement. Rien ne change concernant l'inscription, la connexion, la création de clé ou la vérification — seul le point de sortie des paquets change.
 - Lancez `--screen` dans l'un ou l'autre mode : il teste les sorties dont vous disposez (ou la route directe) contre le fournisseur avant une exécution réelle.
 
 ## 📄 Fichiers
@@ -168,7 +174,7 @@ node src/cli.js --help
 
 ## 🔌 Connexion à 9Router
 
-[9Router](https://9router.com) est un routeur auto-hébergé compatible OpenAI :
+[9Router](https://9router.com) est un routeur auto-hébergé, compatible OpenAI :
 
 ```bash
 node src/connect-9router.js --base http://localhost:20128 --password 123456
@@ -178,26 +184,27 @@ Valeurs par défaut : `--prefix suanlicat`, `--base-url https://suanlicat.top/v1
 
 ## 🔌 Connexion à OmniRoute
 
-[OmniRoute](https://omniroute.online) est un routeur auto-hébergé compatible OpenAI :
+[OmniRoute](https://omniroute.online) est un routeur auto-hébergé, compatible OpenAI :
 
 ```bash
 node src/connect-omniroute.js --base http://localhost:20128 --password 123456
 ```
 
 Valeurs par défaut : `--prefix suanlicat`, `--base-url https://suanlicat.top/v1`, `--model deepseek-v4.1-flash`. Les modèles sont servis sous `suanlicat/<model id>`.
+
 ## 🔑 Ce qu'une clé vous apporte
 
 | | |
 | --- | --- |
 | 🏢 Fournisseur | **SuanliCat (算力狐)** — [suanlicat.top](https://suanlicat.top) |
-| 🎁 Ce que le fournisseur offre | 1 $ (100 000 unités) à l'inscription + ~13k/jour en check-in |
+| 🎁 Ce que le fournisseur offre | 1 $ (100 000 unités) à l'inscription + ~13k/jour de connexion |
 | 🔑 Ce qu'une clé vous apporte | une clé sur son propre compte, vérifiée par chat sur `deepseek-v4.1-flash` |
 | 🌐 Forme de l'API | compatible OpenAI : `POST https://suanlicat.top/v1/chat/completions` |
-| 🔒 Vos données | seuls `suanlicat.top` et votre backend de boîte mail sont contactés |
+| 🔒 Vos données | seuls `suanlicat.top` et votre backend de boîte de réception sont contactés |
 
 ## 🐞 Problèmes
 
-Si SuanliCat modifie ses portes d'inscription ou la récompense de check-in, l'outil s'arrête là et le signale. **[Ouvrez un ticket](../../issues)** avec la commande et la sortie exacte.
+Si SuanliCat modifie ses conditions d'inscription ou la récompense de connexion, l'outil s'arrête là et le signale. **[Ouvrez un ticket](../../issues)** avec la commande et la sortie exacte.
 
 ## 📄 Licence
 

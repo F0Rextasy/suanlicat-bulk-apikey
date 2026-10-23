@@ -21,7 +21,7 @@
 [![OmniRoute](https://img.shields.io/badge/OmniRoute-connector-8B5CF6?style=for-the-badge)](#-connect-to-omniroute)
 [![X](https://img.shields.io/badge/X-%40bigbullapp-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/bigbullapp)
 
-[🛠 Schnellstart](#-quick-start) · [🎁 Kostenlose Stufe](#-free-tier--how-much-you-get) · [🤖 Modelle](#-models--all-17-of-them) · [🧪 Die API verwenden](#-how-to-use-the-api) · [✅ Verifiziert](#-verified-working--every-key-is-tested) · [🧭 So funktioniert es](#-how-it-works) · [🔌 9Router](#-connect-to-9router) · [⚙️ Optionen](#️-cli-options) · [🛰️ Proxys](#️-behind-a-proxy) · [🐞 Probleme](#-issues)
+[🛠 Schnellstart](#-quick-start) · [🎁 Kostenlose Stufe](#-free-tier--how-much-you-get) · [🤖 Modelle](#-models--all-17-of-them) · [🧪 Die API verwenden](#-how-to-use-the-api) · [✅ Verifiziert](#-verified-working--every-key-is-tested) · [🧭 So funktioniert es](#-how-it-works) · [🔌 9Router](#-connect-to-9router) · [🔌 OmniRoute](#-connect-to-omniroute) · [⚙️ Optionen](#️-cli-options) · [🛰️ Proxys](#️-behind-a-proxy) · [🐞 Probleme](#-issues)
 
 </div>
 
@@ -35,32 +35,32 @@
 
 ## ✨ Warum es das gibt
 
-SuanliCat (算力狐) verteilt **100.000 Quota-Einheiten (≈ 1 $ bei qpu=100.000) an jedes neue Konto** und zahlt zusätzlich einen **täglichen Check-in von ~13.270 Einheiten**. Die Registrierung erfolgt per E-Mail + 6-stelligem Code, ohne Captcha; die aktuelle Schlüsselzeile ist `deepseek-v4.1-flash`, und das gesamte Tool wurde Ende-zu-Ende bewiesen, indem **100 Konten → 100 verifizierte Schlüssel** erzeugt wurden.
+SuanliCat (算力狐) verteilt **100.000 Quota-Einheiten (≈ 1 $ bei qpu=100.000) an jedes neue Konto** und zahlt zusätzlich einen **täglichen Check-in von ~13.270 Einheiten**. Die Registrierung erfolgt per E-Mail + 6-stelligem Code, ohne Captcha; die live geschaltete Schlüsselzeile ist `deepseek-v4.1-flash`, und das gesamte Tool wurde Ende-zu-Ende bewiesen, indem **100 Konten → 100 verifizierte Schlüssel** erzeugt wurden.
 
 ## 🎁 Kostenlose Stufe — wie viel du bekommst
 
 | Was | Wert |
 | --- | --- |
 | Anmeldeguthaben (`quotaStart`) | **100.000 Einheiten ≈ 1 $** (qpu=100.000) |
-| Täglicher Check-in | **~+13.270 Einheiten/Tag** (gemessen; die CLI checkt sich einmal pro Konto ein, bevor sie den Schlüssel behält) |
-| Registrierung | E-Mail + 6-stelliger Code — **kein Captcha** (`turnstile_check: false`) |
-| Katalog | 17 Modelleinträge im aktuellen Preisblatt |
-| Ratenlimits | Die Registrierung antwortet mit `429` bei Bursts (`register refused`); die CLI wartet ~25 s und versucht es mit demselben frischen Code erneut |
+| Täglicher Check-in | **~+13.270 Einheiten/Tag** (gemessen; die CLI checkt einmal pro Konto ein, bevor sie ihren Schlüssel behält) |
+| Anmeldung | E-Mail + 6-stelliger Code — **kein Captcha** (`turnstile_check: false`) |
+| Katalog | 17 Modelleinträge auf dem live geschalteten Preisblatt |
+| Ratenlimits | register antwortet mit `429` bei Bursts (`register refused`); die CLI wartet ~25 s und versucht es mit demselben frischen Code erneut |
 | Die Einheit, die skaliert | **ein Konto = ein Schlüssel** |
 
-> 💡 Die kostenlose Stufe wird von SuanliCat (算力狐) festgelegt und kann sich ändern. Prüfe die aktuellen Zahlen auf [suanlicat.top](https://suanlicat.top) — und lass das Gate des Tools selbst entscheiden:
+> 💡 Die kostenlose Stufe wird von SuanliCat (算力狐) festgelegt und kann sich ändern. Prüfe die live geschalteten Zahlen auf [suanlicat.top](https://suanlicat.top) — und lass das Gate des Tools selbst entscheiden:
 
 ```bash
 node src/cli.js --verify-only     # every key in keys.txt is re-tested with a real chat call
 ```
 
-## 🤖 Modelle — alle 17
+## 🤖 Modelle — alle 17 davon
 
-Das aktuelle Preisblatt enthält **17 Modelleinträge** (`qwen-turbo`, `doubao-code`, `doubao-pro-max`, `coze-*`, `deepseek-*` …). Die verifizierte Schlüsselzeile:
+Das live geschaltete Preisblatt enthält **17 Modelleinträge** (`qwen-turbo`, `doubao-code`, `doubao-pro-max`, `coze-*`, `deepseek-*` …). Die verifizierte Schlüsselzeile:
 
 | Modell-ID | Verifiziert |
 | --- | --- |
-| `deepseek-v4.1-flash` | **100 Schlüssel chat-200** während des Mints unter `providers/suanlicat/keys.txt`; unabhängige Nachprüfung über die mitgelieferte CLI (siehe Verifiziert-Tabelle) |
+| `deepseek-v4.1-flash` | **jeder Schlüssel, chat-200** während der Erzeugung in `providers/suanlicat/keys.txt`; unabhängige Nachprüfung über die mitgelieferte CLI (siehe die Tabelle „Verifiziert“) |
 
 ```bash
 curl https://suanlicat.top/v1/chat/completions \
@@ -68,7 +68,7 @@ curl https://suanlicat.top/v1/chat/completions \
   -d '{"model":"deepseek-v4.1-flash","messages":[{"role":"user","content":"hi"}],"max_tokens":8}'
 ```
 
-## 🧪 So verwendest du die API
+## 🧪 Die API verwenden
 
 Basis-URL **`https://suanlicat.top/v1`** — OpenAI-kompatibel.
 
@@ -89,11 +89,11 @@ node src/launcher.js        # interactive: mint / verify / screen / settings
 # or: node src/cli.js --count 30    (check-in runs before the chat gate)
 ```
 
-Ein Schlüssel wird **nur** dann in `keys.txt` geschrieben, wenn `/v1/chat/completions` mit 200 und echtem Inhalt antwortet; `accounts.json` speichert Benutzername / E-Mail / quotaStart → quotaAfterCheckin / Gruppe.
+Ein Schlüssel wird **nur** dann in `keys.txt` geschrieben, wenn `/v1/chat/completions` mit 200 und echtem Inhalt antwortet; `accounts.json` behält Benutzername / E-Mail / quotaStart → quotaAfterCheckin / Gruppe.
 
 ### 🖱️ Der Launcher
 
-Der Launcher fragt nach der Proxy-Liste und der Anzahl, merkt sie sich und führt die CLI aus — Mint, Verifizieren, Screen-Exits, Einstellungen, Hilfe, Connect to 9Router.
+Der Launcher fragt nach der Proxy-Liste und der Anzahl, merkt sie sich und führt die CLI aus — mint, verify, screen exits, settings, help, Connect to 9Router.
 
 ## ✅ Verifiziert funktionierend — jeder Schlüssel wird getestet
 
@@ -101,15 +101,21 @@ Der Launcher fragt nach der Proxy-Liste und der Anzahl, merkt sie sich und führ
 | --- | --- |
 | `GET /api/status` | **200** — Registrierung an, E-Mail-Verifizierung an, Captcha aus, Check-in an |
 | `POST /api/user/checkin` | **200** — der tägliche Bonus landet auf dem Konto |
-| `POST /api/token/` (+ reveal) | **200** — Schlüsselmaterial wird einmal zurückgegeben |
-| `POST /v1/chat/completions` (`deepseek-v4.1-flash`) — für **jeden** Schlüssel, bevor er geschrieben wird | **200** mit echtem Inhalt — der 100-Schlüssel-Mint wurde mit 100/100 abgeschlossen |
-| unabhängige Nachprüfung — **100/100 Schlüssel live** über die mitgelieferte CLI (`--verify-only`, frischer Exit, `deepseek-v4.1-flash` chat-200, 2026-10-20) |
-| Hinweis von der Panel-Seite | Die Registrierung drosselt mit `429` bei Burst — die CLI wartet ~25 s und versucht es erneut; eine E-Mail, die nie ankommt (gemeinsam genutzte Temp-Mail-Domains), wechselt zur nächsten Box |
+| `POST /api/token/` (+ reveal) | **200** — Schlüsselmaterial wird einmalig zurückgegeben |
+| `POST /v1/chat/completions` (`deepseek-v4.1-flash`) — für **jeden** Schlüssel, bevor er geschrieben wird | **200** mit echtem Inhalt — die 100-Schlüssel-Erzeugung wurde mit 100/100 abgeschlossen |
+| unabhängige Nachprüfung — **jeder Schlüssel verifiziert** über die mitgelieferte CLI (`--verify-only`, frischer Exit, `deepseek-v4.1-flash` chat-200, 2026-10-20) |
+| Hinweis von der Panel-Seite | register drosselt mit `429` bei Burst — die CLI wartet ~25 s und versucht es erneut; eine E-Mail, die nie ankommt (geteilte Temp-Mail-Domains), wechselt zur nächsten Box |
 
 ```bash
 node src/cli.js --verify-only
 node src/cli.js --screen
 ```
+
+> **Qualitätsgates.** Jeder Schlüssel hier hat ein live geschaltetes `chat-200` bestanden, bevor er in `keys.txt`
+> geschrieben wurde (tote Schlüssel werden nie ausgeliefert). Router-Kombinationen folgen derselben Regel auf Modellebene: ein Eintrag wird
+> **nur hinzugefügt, wenn das Modell mit `chat-200` antwortet und Tools aufrufen kann** — ein Modell ohne Tool-Unterstützung,
+> ein toter Schlüssel oder ein toter Anbieter wird verworfen statt hinzugefügt. Führe den Verifizierungsschritt jederzeit erneut aus;
+> Fehler werden gemeldet, nie versteckt.
 
 ## 🧭 So funktioniert es
 
@@ -124,13 +130,13 @@ inbox (one address per account)                                  a fresh address
 
 | Schritt | Aufruf | Hinweise |
 | --- | --- | --- |
-| Status | `GET /api/status` | Register-/E-Mail-/Check-in-Gates (Captcha aus) |
-| Mailbox | Emailnator `POST /api/generate-email` | eine frische @gmail.com pro Konto (punktfreie Form) |
+| status | `GET /api/status` | register/E-Mail/Check-in-Gates (Captcha aus) |
+| mailbox | Emailnator `POST /api/generate-email` | eine frische @gmail.com pro Konto (punktfreie Form) |
 | Code senden | `GET /api/verification?email=…` | 6-stelliger Code |
-| Registrieren | `POST /api/user/register` | 429 → warten, denselben frischen Code erneut versuchen |
-| Anmelden | `POST /api/user/login` | Sitzungstoken |
+| registrieren | `POST /api/user/register` | 429 → warten, denselben frischen Code erneut versuchen |
+| anmelden | `POST /api/user/login` | Session-Token |
 | Check-in | `POST /api/user/checkin` | der tägliche Bonus |
-| Schlüssel | `POST /api/token/` (+ reveal) | einmal geschrieben |
+| Schlüssel | `POST /api/token/` (+ reveal) | einmalig geschrieben |
 | Nachweis | `POST /v1/chat/completions` | 200 mit Inhalt = der Schlüssel ist live |
 
 ## ⚙️ CLI-Optionen
@@ -151,17 +157,17 @@ node src/cli.js --help
 
 ## 🛰️ Hinter einem Proxy
 
-**Optional — bei Skalierung empfohlen (Limits pro IP, Bans).** Das Tool funktioniert auch ohne Proxy.
+**Optional — bei Skalierung empfohlen (Limits pro IP, Sperren).** Das Tool funktioniert auch ohne Proxy.
 
-- **Mit einem Pool:** Übergib `--pool <file>` (oder setze `SUANLICAT_PROXIES`), und jede Anfrage geht über einen Exit aus dieser Liste — eine tote Leitung lässt diesen Versuch fehlschlagen, und das Tool wechselt zur nächsten (fail-closed, solange ein Pool bereitgestellt wird; der Pool wird bei der Verwendung erneut geprüft).
-- **Ohne einen Pool:** Die CLI gibt `running WITHOUT a proxy (direct)` aus und verbindet direkt. An Registrierung, Check-in, Schlüsselerstellung oder Verifizierung ändert sich nichts — nur daran, wo die Pakete das Netz verlassen.
-- Führe `--screen` gegen beide Modi aus: Es testet die Exits, die du hast (oder die direkte Route), gegen den Anbieter, bevor ein echter Lauf startet.
+- **Mit einem Pool:** übergib `--pool <file>` (oder setze `SUANLICAT_PROXIES`), und jede Anfrage geht über einen Exit aus dieser Liste — eine tote Leitung lässt diesen Versuch fehlschlagen und das Tool wechselt zur nächsten (fail-closed, solange ein Pool bereitgestellt wird; der Pool wird bei der Verwendung erneut geprüft).
+- **Ohne einen Pool:** die CLI gibt `running WITHOUT a proxy (direct)` aus und verbindet direkt. An Anmeldung, Check-in, Schlüsselerzeugung oder Verifizierung ändert sich nichts — nur daran, wo die Pakete rausgehen.
+- Führe `--screen` gegen beide Modi aus: es testet die Exits, die du hast (oder die direkte Route), gegen den Anbieter, bevor ein echter Lauf startet.
 
 ## 📄 Dateien
 
 | Pfad | Inhalt |
 | --- | --- |
-| `keys.txt` | ein live-verifizierter Schlüssel pro Zeile — von Git ignoriert |
+| `keys.txt` | ein live verifizierter Schlüssel pro Zeile — von Git ignoriert |
 | `accounts.json` | Benutzername / E-Mail / quotaStart / quotaAfterCheckin / Gruppe |
 | `proxies.txt` | deine Exits — von Git ignoriert |
 | `outputs/` | Lauf-Logs — von Git ignoriert |
@@ -185,19 +191,20 @@ node src/connect-omniroute.js --base http://localhost:20128 --password 123456
 ```
 
 Standardwerte: `--prefix suanlicat`, `--base-url https://suanlicat.top/v1`, `--model deepseek-v4.1-flash`. Modelle werden als `suanlicat/<model id>` bereitgestellt.
-## 🔑 Was ein Schlüssel dir bringt
+
+## 🔑 Was dir ein Schlüssel bringt
 
 | | |
 | --- | --- |
 | 🏢 Anbieter | **SuanliCat (算力狐)** — [suanlicat.top](https://suanlicat.top) |
 | 🎁 Was der Anbieter gibt | 1 $ (100.000 Einheiten) bei der Anmeldung + ~13k/Tag Check-in |
-| 🔑 Was ein Schlüssel dir bringt | ein Schlüssel auf einem eigenen Konto, chat-verifiziert auf `deepseek-v4.1-flash` |
+| 🔑 Was dir ein Schlüssel bringt | ein Schlüssel auf einem eigenen Konto, chat-verifiziert auf `deepseek-v4.1-flash` |
 | 🌐 API-Form | OpenAI-kompatibel: `POST https://suanlicat.top/v1/chat/completions` |
-| 🔒 Deine Daten | Es werden nur `suanlicat.top` und dein Inbox-Backend kontaktiert |
+| 🔒 Deine Daten | nur `suanlicat.top` und dein Inbox-Backend werden kontaktiert |
 
 ## 🐞 Probleme
 
-Wenn SuanliCat seine Registrierungs-Gates oder die Check-in-Belohnung ändert, stoppt das Tool dort und sagt es dir. **[Öffne ein Issue](../../issues)** mit dem Befehl und der exakten Ausgabe.
+Wenn SuanliCat seine Registrierungs-Gates oder die Check-in-Belohnung ändert, stoppt das Tool dort und sagt es. **[Öffne ein Issue](../../issues)** mit dem Befehl und der exakten Ausgabe.
 
 ## 📄 Lizenz
 

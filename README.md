@@ -21,7 +21,7 @@
 [![OmniRoute](https://img.shields.io/badge/OmniRoute-connector-8B5CF6?style=for-the-badge)](#-connect-to-omniroute)
 [![X](https://img.shields.io/badge/X-%40bigbullapp-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/bigbullapp)
 
-[🛠 Quick start](#-quick-start) · [🎁 Free tier](#-free-tier--how-much-you-get) · [🤖 Models](#-models--all-17-of-them) · [🧪 Use the API](#-how-to-use-the-api) · [✅ Verified](#-verified-working--every-key-is-tested) · [🧭 How it works](#-how-it-works) · [🔌 9Router](#-connect-to-9router) · [⚙️ Options](#️-cli-options) · [🛰️ Proxies](#️-behind-a-proxy) · [🐞 Issues](#-issues)
+[🛠 Quick start](#-quick-start) · [🎁 Free tier](#-free-tier--how-much-you-get) · [🤖 Models](#-models--all-17-of-them) · [🧪 Use the API](#-how-to-use-the-api) · [✅ Verified](#-verified-working--every-key-is-tested) · [🧭 How it works](#-how-it-works) · [🔌 9Router](#-connect-to-9router) · [🔌 OmniRoute](#-connect-to-omniroute) · [⚙️ Options](#️-cli-options) · [🛰️ Proxies](#️-behind-a-proxy) · [🐞 Issues](#-issues)
 
 </div>
 
@@ -35,7 +35,7 @@
 
 ## ✨ Why this exists
 
-SuanliCat (算力狐) hands out **100,000 quota units (≈ $1 at qpu=100,000) to every new account** and pays a **daily check-in of ~13,270 units** on top. Registration is e-mail + 6-char code, captcha-free; the verified keys line is `deepseek-v4.1-flash`, and the whole tool was proven end-to-end by minting **100 accounts → 100 verified keys**.
+SuanliCat (算力狐) hands out **100,000 quota units (≈ $1 at qpu=100,000) to every new account** and pays a **daily check-in of ~13,270 units** on top. Registration is e-mail + 6-char code, captcha-free; the live key line is `deepseek-v4.1-flash`, and the whole tool was proven end-to-end by minting **100 accounts → 100 verified keys**.
 
 ## 🎁 Free tier — how much you get
 
@@ -60,7 +60,7 @@ The live pricing sheet carries **17 model entries** (`qwen-turbo`, `doubao-code`
 
 | Model ID | Verified |
 | --- | --- |
-| `deepseek-v4.1-flash` | **chat-200** during the mint at `providers/suanlicat/keys.txt`; independent re-check via the shipped CLI (see the Verified table) |
+| `deepseek-v4.1-flash` | **every key, chat-200** during the mint at `providers/suanlicat/keys.txt`; independent re-check via the shipped CLI (see the Verified table) |
 
 ```bash
 curl https://suanlicat.top/v1/chat/completions \
@@ -96,24 +96,25 @@ The launcher asks for the proxy list and count, remembers them, and runs the CLI
 
 ## ✅ Verified working — every key is tested
 
-> **Quality gates.** Every key here passed a live `chat-200` before it was written to `keys.txt`
-> (dead keys are never shipped). Router combos follow the same rule at the model level: an entry is
-> added **only if the model answers `chat-200` and can call tools** — a model without tool support,
-> a dead key or a dead provider is dropped instead of added. Works with **9Router and OmniRoute**.
-
 | Check | Result |
 | --- | --- |
 | `GET /api/status` | **200** — register on, e-mail verification on, captcha off, check-in on |
 | `POST /api/user/checkin` | **200** — daily bonus lands on the account |
 | `POST /api/token/` (+ reveal) | **200** — key material returned once |
 | `POST /v1/chat/completions` (`deepseek-v4.1-flash`) — for **every** key before it is written | **200** with real content — the 100-key mint completed at 100/100 |
-| independent re-check — **verified working** via the shipped CLI (`--verify-only`, fresh exit, `deepseek-v4.1-flash` chat-200, 2026-10-20) |
+| independent re-check — **every key verified** via the shipped CLI (`--verify-only`, fresh exit, `deepseek-v4.1-flash` chat-200, 2026-10-20) |
 | panel-side note | register throttles with `429` under burst — the CLI waits ~25 s and retries; a mail that never arrives (shared temp-mail domains) moves to the next box |
 
 ```bash
 node src/cli.js --verify-only
 node src/cli.js --screen
 ```
+
+> **Quality gates.** Every key here passed a live `chat-200` before it was written to `keys.txt`
+> (dead keys are never shipped). Router combos follow the same rule at the model level: an entry is
+> added **only if the model answers `chat-200` and can call tools** — a model without tool support,
+> a dead key or a dead provider is dropped instead of added. Re-run the verify step any time;
+> failures are reported, never hidden.
 
 ## 🧭 How it works
 
@@ -189,6 +190,7 @@ node src/connect-omniroute.js --base http://localhost:20128 --password 123456
 ```
 
 Defaults: `--prefix suanlicat`, `--base-url https://suanlicat.top/v1`, `--model deepseek-v4.1-flash`. Models are served as `suanlicat/<model id>`.
+
 ## 🔑 What one key gets you
 
 | | |
